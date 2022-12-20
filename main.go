@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"time"
 
@@ -22,7 +24,10 @@ type Recipe struct {
 var recipes []Recipe
 func init() {
 	recipes = make([]Recipe, 0)
+	file, _ := ioutil.ReadFile("recipes.json")
+	_ = json.Unmarshal([]byte(file), &recipes)
 }
+
 
 // POST: /recipes
 // ID and PublishedAt are auto-generated.
@@ -38,7 +43,10 @@ func NewRecipeHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, recipe)
 }
 
-
+// GET: /recipes
+func ListRecipesHandler(c *gin.Context) {
+	c.JSON(http.StatusOK, recipes)
+}
 
 func main() {
 	fmt.Println("Starting Server on localhost:8080 ... ")
@@ -46,6 +54,7 @@ func main() {
 
 	// Create routes
 	router.POST("/recipes", NewRecipeHandler)
+	router.GET("/recipes", ListRecipesHandler)
 
 
 	router.Run(":8080")
