@@ -46,8 +46,16 @@ func init() {
 	_ = json.Unmarshal([]byte(file), &recipes)
 }
 
-// POST: /recipes
-// ID and PublishedAt are auto-generated.
+// swagger:operation POST /recipes/ recipes newRecipe
+// Post a new recipe
+// ---
+// produces:
+// - application/json
+// responses:
+// '200':
+// description: Successful operation
+// '400':
+// description: Bad Request (Check Json in Body)
 func NewRecipeHandler(c *gin.Context) {
 	var recipe Recipe
 	if err := c.ShouldBindJSON(&recipe); err != nil {
@@ -72,7 +80,24 @@ func ListRecipesHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, recipes)
 }
 
-// PUT: /recipes/:id
+// swagger:operation PUT /recipes/{id} recipes updateRecipe
+// Update an existing recipe
+// ---
+// parameters:
+// - name: id
+// in: path
+// description: ID of the recipe
+// required: true
+// type: string
+// produces:
+// - application/json
+// responses:
+// '200':
+// description: Successful operation
+// '400':
+// description: Invalid input
+// '404':
+// description: Invalid recipe ID
 func UpdateRecipeHandler(c *gin.Context) {
 	id := c.Param("id")
 	var recipe Recipe
@@ -98,7 +123,22 @@ func UpdateRecipeHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, recipe)
 }
 
-// DELETE: /recipes/:id
+// swagger:operation DELETE /recipes/{id} recipes deleteRecipe
+// Delete an existing recipe
+// ---
+// parameters:
+// - name: id
+// in: path
+// description: ID of the recipe
+// required: true
+// type: string
+// produces:
+// - application/json
+// responses:
+// '200':
+// description: Successful operation
+// '404':
+// description: Invalid recipe ID
 func DeleteRecipeHandler(c *gin.Context) {
 	id := c.Param("id")
 	index := -1
@@ -117,7 +157,20 @@ func DeleteRecipeHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Recipe has been deleted"})
 }
 
-// GET: /recipes/search?tag=....
+// swagger:operation POST /recipes/search?tag={tag} recipes searchRecipe
+// Search recipes with a tag
+// ---
+// parameters:
+// - name: tag
+// in: path
+// description: Tag of a recipe
+// required: true
+// type: string
+// produces:
+// - application/json
+// responses:
+// '200':
+// description: Successful operation
 func SearchRecipesHandler(c *gin.Context) {
 	tag := c.Query("tag")
 	listOfRecipes := make([]Recipe, 0)
