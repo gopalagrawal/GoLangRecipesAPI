@@ -1,3 +1,20 @@
+// Recipes API
+//
+// This is a sample recipes API.
+//
+//	Schemes: http
+//	Host: localhost:8080
+//	BasePath: /
+//	Version: 1.0.0
+//	Contact: Gopal Agrawal <ga.willbe@gmail.com>
+//
+//	Consumes:
+//	- application/json
+//
+//	Produces:
+//	- application/json
+//
+// swagger:meta
 package main
 
 import (
@@ -29,8 +46,30 @@ func init() {
 	_ = json.Unmarshal([]byte(file), &recipes)
 }
 
-// POST: /recipes
-// ID and PublishedAt are auto-generated.
+// swagger:operation GET /recipes recipes listRecipes
+// Returns list of recipes
+// ---
+// produces:
+// - application/json
+// responses:
+//
+//	    '200':
+//		        description: Successful operation
+func ListRecipesHandler(c *gin.Context) {
+	c.JSON(http.StatusOK, recipes)
+}
+
+// swagger:operation POST /recipes recipes newRecipe
+// Create a new recipes
+// ---
+// produces:
+// - application/json
+// responses:
+//
+//	     '200':
+//			    description: Successful operation
+//	     '400':
+//	         description: Bad Content
 func NewRecipeHandler(c *gin.Context) {
 	var recipe Recipe
 	if err := c.ShouldBindJSON(&recipe); err != nil {
@@ -43,12 +82,32 @@ func NewRecipeHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, recipe)
 }
 
-// GET: /recipes
-func ListRecipesHandler(c *gin.Context) {
-	c.JSON(http.StatusOK, recipes)
-}
 
-// PUT: /recipes/:id
+// swagger:operation PUT /recipes/{id} recipes updateRecipe
+// Update an existing recipe
+// ---
+// parameters:
+//
+// - name: id
+//   in: path
+//   description: ID of the recipe
+//   required: true
+//   type: string
+//
+// - name: data
+//   in: body
+//   description: JSON containing updated recipe
+//   type: string
+//
+// produces:
+// - application/json
+// responses:
+//     '200':
+//         description: Successful operation
+//     '400':
+//         description: Invalid input
+//     '404':
+//         description: Invalid recipe ID
 func UpdateRecipeHandler(c *gin.Context) {
 	id := c.Param("id")
 	var recipe Recipe
@@ -74,7 +133,23 @@ func UpdateRecipeHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, recipe)
 }
 
-// DELETE: /recipes/:id
+
+// swagger:operation DELETE /recipes/{id} recipes deleteRecipe
+// Delete an existing recipe
+// ---
+// produces:
+// - application/json
+// parameters:
+//   - name: id
+//     in: path
+//     description: ID of the recipe
+//     required: true
+//     type: string
+// responses:
+//     '200':
+//         description: Successful operation
+//     '404':
+//         description: Invalid recipe ID
 func DeleteRecipeHandler(c *gin.Context) {
 	id := c.Param("id")
 	index := -1
@@ -93,7 +168,21 @@ func DeleteRecipeHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Recipe has been deleted"})
 }
 
-// GET: /recipes/search?tag=....
+
+// swagger:operation GET /recipes/search recipes findRecipe
+// Search recipes based on tags
+// ---
+// produces:
+// - application/json
+// parameters:
+//   - name: tag
+//     in: query
+//     description: recipe tag
+//     required: true
+//     type: string
+// responses:
+//     '200':
+//         description: Successful operation
 func SearchRecipesHandler(c *gin.Context) {
 	tag := c.Query("tag")
 	listOfRecipes := make([]Recipe, 0)
@@ -111,9 +200,29 @@ func SearchRecipesHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, listOfRecipes)
 }
 
+// CORS Middleware
+func CORS() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		fmt.Println(c.Request.Header)
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+        c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+        c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE")
+
+        if c.Request.Method == "OPTIONS" {
+            c.AbortWithStatus(204)
+            return
+        }
+
+		c.Next()
+	}
+}
+
 func main() {
 	fmt.Println("Starting Server on localhost:8080 ... ")
 	router := gin.Default()
+	router.Use(CORS())
 
 	// Create routes
 	router.POST("/recipes", NewRecipeHandler)
