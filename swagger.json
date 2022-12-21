@@ -1,0 +1,42 @@
+{
+    "swagger": "2.0",
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "schemes": [
+        "http"
+    ],
+    "info": {
+        "description": "This is a sample recipes API.",
+        "title": "Recipes API",
+        "contact": {
+            "name": "Gopal Agrawal",
+            "email": "gopal@zxy.com"
+        },
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/recipes": {
+            "get": {
+                "description": "Returns list of recipes",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "recipes"
+                ],
+                "operationId": "listRecipes",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    }
+                }
+            }
+        }
+    },
+    "host": "localhost:8080",
+    "basePath": "/"
+}

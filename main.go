@@ -1,3 +1,20 @@
+// Recipes API
+//
+// This is a sample recipes API.
+//
+//	Schemes: http
+//  Host: localhost:8080
+//	BasePath: /
+//	Version: 1.0.0
+//	Contact: Gopal Agrawal <ga.willbe@gmail.com>
+//
+//	Consumes:
+//	- application/json
+//
+//	Produces:
+//	- application/json
+// swagger:meta
+
 package main
 
 import (
@@ -43,7 +60,14 @@ func NewRecipeHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, recipe)
 }
 
-// GET: /recipes
+// swagger:operation GET /recipes recipes listRecipes
+// Returns list of recipes
+// ---
+// produces:
+// - application/json
+// responses:
+// 	'200':
+// 		description: Successful operation
 func ListRecipesHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, recipes)
 }
@@ -111,9 +135,26 @@ func SearchRecipesHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, listOfRecipes)
 }
 
+
+// CORS Middleware
+func CORS() gin.HandlerFunc {
+    return func(c *gin.Context) {
+
+        fmt.Println(c.Request.Header)
+        c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+        c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+        c.Next()
+    }
+}
+
+
+
+
 func main() {
 	fmt.Println("Starting Server on localhost:8080 ... ")
 	router := gin.Default()
+	router.Use(CORS())
+
 
 	// Create routes
 	router.POST("/recipes", NewRecipeHandler)
